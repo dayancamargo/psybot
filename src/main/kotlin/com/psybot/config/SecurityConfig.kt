@@ -26,64 +26,33 @@ class SecurityConfig(
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @Bean
-    fun userDetailsService(): MapReactiveUserDetailsService {
-        // @formatter:off
-        val user = User.withDefaultPasswordEncoder()
-            .username("user")
-            .password("password")
-            .roles("USER")
-            .build()
-        val admin = User.withDefaultPasswordEncoder()
-            .username("admin")
-            .password("password")
-            .roles("ADMIN", "USER")
-            .build()
-        // @formatter:on
-        return MapReactiveUserDetailsService(user, admin)
-    }
-
-    @Bean
     fun springWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         http
-            .csrf().disable()
+            .csrf { it.disable() }
             .exceptionHandling { handle ->
                 handle
                     .authenticationEntryPoint { swe, e ->
-                        logger.info("Exchange: {} Error: {}", swe, e)
-                        Mono.fromRunnable{ swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED) }
+                        logger.error("Uri: {} Error: {}", swe.request.uri, e.message)
+                        Mono.fromRunnable { swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED) }
                     }
                     .accessDeniedHandler { swe, e ->
-                        logger.info("Exchange: {} Error: {}", swe, e)
-                        Mono.fromRunnable{ swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN) }
+                        logger.error("Uri: {} Error: {}", swe.request.uri, e.message)
+                        Mono.fromRunnable { swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN) }
                     }
             }
             .authorizeExchange { authorize: AuthorizeExchangeSpec ->
                 authorize
-                    .pathMatchers("/api/auth", "api/auth/refresh", "/error", "/login").permitAll()
+                    .pathMatchers( "/error", "/login").permitAll()
                     .pathMatchers(HttpMethod.POST, "/api/user", "/login").permitAll()
-                    .pathMatchers("/api/user**", "/psychiatrist").hasRole("ADMIN")
-                    .anyExchange().permitAll()
+                    .pathMatchers("/psychiatrist").hasRole("ADMIN")
+                    .anyExchange().authenticated()
             }
             .authenticationManager(authenticationManager)
             .securityContextRepository(securityContextRepository)
-//            .httpBasic(withDefaults())
         return http.build()
     }
-
-//
-//    @Bean
-//    open fun webHttpSecurity(http: ServerHttpSecurity): SecurityWebFilterChain {
-//        return http {
-//            authorizeExchange {
-//                authorize(anyExchange, authenticated)
-//            }
-//            httpBasic { }
-//        }
-//    }
-//    @Bean
+}
 //    fun filterChain(http: HttpSecurity): SecurityFilterChain {
-//        return http
-//            .csrf { it.disable() }
 //            .authorizeHttpRequests {
 //                it
 //                    .requestMatchers("/api/auth", "api/auth/refresh", "/error")
@@ -100,17 +69,3 @@ class SecurityConfig(
 //            }
 ////            .userDetailsService(userDetailsService())
 ////            .userDetailsService(ReactiveUserDetailsService)
-//            .build()
-//    }
-
-//    private fun userDetailsService(): UserDetailsService {
-//        return InMemoryUserDetailsManager().apply {
-//            createUser(
-//                User.withUsername("admin")
-//                    .password("password")
-//                    .roles("USER", "ADMIN")
-//                    .build()
-//            )
-//        }
-//    }
-}

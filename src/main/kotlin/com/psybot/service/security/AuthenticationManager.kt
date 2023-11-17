@@ -23,11 +23,10 @@ class AuthenticationManager(val jwtUtil: JwtTokenUtil) : ReactiveAuthenticationM
             .switchIfEmpty(Mono.empty())
             .map { valid ->
                 val claims: Claims = jwtUtil.getAllClaimsFromToken(authToken)
-                val rolesMap = claims.get("role", Collection::class.java)
                 UsernamePasswordAuthenticationToken(
                     username,
                     null,
-                    rolesMap as MutableCollection<out GrantedAuthority>?
+                    claims.get("role", Collection::class.java).map { SimpleGrantedAuthority(it.toString()) }
                 )
             }
     }
