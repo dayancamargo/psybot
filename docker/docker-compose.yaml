@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+
+  postgres:
+    image: postgres:16.1-alpine3.18
+    container_name: psybot-postgres 
+    restart: always
+    environment:
+    - POSTGRES_USER=dbuser
+    - POSTGRES_PASSWORD=dbpwd
+    ports:
+    - '5432:5432'
+    volumes:
+    - db_pg_volume:/var/lib/postgresql/data
+
+volumes:
+  db_pg_volume:
+
+networks:
+  default:
+    external: true
+    name: docker_default

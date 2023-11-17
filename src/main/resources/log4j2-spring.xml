@@ -2,7 +2,7 @@
 <Configuration monitorInterval="5">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%X] %style{%d{ISO8601}}{black} %highlight{%-5level} %style{%C{1.}}{bright,yellow}: %msg%n%throwable" />
+            <PatternLayout pattern="[%X{traceId}] %style{%d{ISO8601}}{black} %highlight{%-5level} %style{%C{1.}}{bright,yellow}: %msg%n%throwable" />
         </Console>
 
         <Console name="Console-external" target="SYSTEM_OUT">
@@ -35,6 +35,9 @@
     <Loggers>
         <!-- Em profiles que sejam diferentes dos utilizados em dev / prod aumenta nível de logs  -->
         <SpringProfile name="!dev, !prod">
+<!--            <Logger name="org.springframework.security" level="debug" additivity="false">-->
+<!--                <AppenderRef ref="Console"/>-->
+<!--            </Logger>-->
             <Logger name="com.psybot" level="debug" additivity="false">
                 <AppenderRef ref="Console"/>
             </Logger>
@@ -62,9 +65,9 @@
             </Logger>
         </SpringProfile>
         <!-- Loga tudo que não for específico das classes da aplicação apenas com nível de INFO para cima -->
-        <Root level="info">
-            <AppenderRef ref="Console-external"/>
-        </Root>
+<!--        <Root level="info">-->
+<!--            <AppenderRef ref="Console-external"/>-->
+<!--        </Root>-->
     </Loggers>
 
 </Configuration>
