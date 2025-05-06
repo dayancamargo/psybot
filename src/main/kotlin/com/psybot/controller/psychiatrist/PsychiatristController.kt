@@ -1,7 +1,6 @@
 package com.psybot.controller.psychiatrist
 
 import com.psybot.model.psychiatrist.PsychiatristRequest
-import com.psybot.model.psychiatrist.toResponse
 import com.psybot.service.psychiatrist.PsychiatristService
 import jakarta.validation.Valid
 import org.slf4j.Logger
@@ -24,7 +23,7 @@ class PsychiatristController(
 
     @GetMapping()
     fun findAll() =
-        psychiatristService.find().map { psy -> psy.toResponse() }
+        psychiatristService.find()
 
     @PostMapping()
     fun create( @Valid @RequestBody psychiatristRequest: PsychiatristRequest) =

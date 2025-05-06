@@ -17,6 +17,12 @@ management:
 spring:
   application:
     name: psybot
+  data:
+    redis:
+      host: "localhost"
+      port: 6379
+      ttl: 300000ms
+      timeout: 1000ms
   profiles:
     active: ${ENV_PROFILE:local}
 #  main:
@@ -44,6 +50,11 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+
+  reactor:
+    #show the context propagation for logs (traceId)
+    context-propagation: AUTO
+
   r2dbc:
     url: "r2dbc:postgresql://localhost:5432/postgres?currentSchema=psybot"
     username: dbuser
@@ -51,7 +62,23 @@ spring:
 open-chat:
   key: "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"
 
+#springdoc:
+#  packagesToScan: com.psybot.controller
+##  pathsToMatch: /v1, /api/balance/**
+#  swagger-ui:
+#    protocol: "https"
+#    path: "/swagger-ui.html"
+
 token:
   jwt:
     secret: "minha-secret-super-segura-e-supimpa"
     expiration: 10000
+
+#
+#
+#    redis:
+#      timeout: 1000ms
+#      lettuce:
+#        cluster:
+#          refresh:
+#            adaptive: true
